@@ -18,7 +18,7 @@
     <ClCompile Include="snakeApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\linkedlistBase\linkedlistBase\linkedlistLib.c">
+    <ClCompile Include="doublyLinkedList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,14 +5,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <windows.h>
 #include <math.h>
-#include "linkedlistLib.h"
 #include <conio.h>
+#include "doublyLinkedList.h"
 
 //#include <thread>
 
-typedef struct coord {
+typedef struct Coord {
     uint16_t X;
     uint16_t Y;
 }Coord_Typedef;
@@ -30,17 +31,17 @@ static const char LTCornerline = (char)201;
 static const char LBCornerline = (char)200;
 static const char block        = (char)148;
 
-static bool snakeDrawBlocking(LinkedList_Typedef* list, bool eraseTheLast);
-static bool snakeDrawNonBlocking(LinkedList_Typedef* list, bool eraseTheLast);
-static void UpdateSnake(LinkedList_Typedef* list, char* statickeyPress);
+static bool snakeDrawBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
+static bool snakeDrawNonBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
+static void UpdateSnake(doublyLinkedList_Typedef* list, char* statickeyPress);
 static void frameCreation(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength, uint8_t yLength);
 static char DirectionHandler(void);
 static char BlockingkeyPressDetection(void);
-static void increaseYaxisTest(LinkedList_Typedef* list);
+static void increaseYaxisTest(doublyLinkedList_Typedef* list);
 
 static bool limitCheck(char direction, Coord_Typedef* axisData);
-void move(node_Typedef* node,bool);
-static void WriteListData_TestCode(LinkedList_Typedef* list);
+void move(doublyLinkedList_Typedef* node,bool);
+static void WriteListData_TestCode(doublyLinkedList_Typedef* list);
 void clearArea(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop);
 static void printStringOnSpesificLocation(uint16_t X, uint16_t Y, char* str);
 static void printCharOnSpesificLocation(uint16_t X, uint16_t Y, char chr);
@@ -55,11 +56,11 @@ Coord_Typedef c3;
 Coord_Typedef c4;
 Coord_Typedef c5;
 Coord_Typedef c6;
-node_Typedef* headNode;
-LinkedList_Typedef list;
+
+doublyLinkedList_Typedef* list;
 int main()
 {
-    InitializeLinkedList(&list);
+    
     frameCreation(X1, Y1, X2 - X1, Y2 - Y1);
 
     c1.X = X1+10;
@@ -75,12 +76,19 @@ int main()
     c6.X = X1 + 5;
     c6.Y = c1.Y;
 
-    headNode = list.Functions.AddMainNode(&c1);
-               list.Functions.AddSibling(headNode, &c2);
-               list.Functions.AddSibling(headNode, &c3);
-               list.Functions.AddSibling(headNode, &c4);
-               list.Functions.AddSibling(headNode, &c5);
-               list.Functions.AddSibling(headNode, &c6);
+    AddNode(&list, &c1); 
+    AddNode(&list, &c2); 
+    AddNode(&list, &c3); 
+    AddNode(&list, &c4); 
+    AddNode(&list, &c5); 
+    AddNode(&list, &c6); 
+
+    //headNode = list.Functions.AddMainNode(&c1);
+    //           list.Functions.AddSibling(headNode, &c2);
+    //           list.Functions.AddSibling(headNode, &c3);
+    //           list.Functions.AddSibling(headNode, &c4);
+    //           list.Functions.AddSibling(headNode, &c5);
+    //           list.Functions.AddSibling(headNode, &c6);
 
     uint32_t f = 0;
     char keyPress = NULL;
@@ -94,9 +102,9 @@ int main()
         // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
         //WriteListData_TestCode(&list);
 
-        UpdateSnake(&list, &keyPress);              
+        UpdateSnake(list, &keyPress);              
         Delay();
-        snakeDrawBlocking(&list,true);
+        snakeDrawBlocking(list,true);
         // increaseYaxisTest(&list);
         // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
     }
@@ -109,9 +117,8 @@ static void Delay(void) {
         ;
     }
 }
-static void increaseYaxisTest(LinkedList_Typedef* list) {
-    node_Typedef* node = list->ListHead;
-
+static void increaseYaxisTest(doublyLinkedList_Typedef* list) {
+    doublyLinkedList_Typedef* node = list;
     while (node) {
         ((Coord_Typedef*)(node->data))->Y += 1;
         node = node->right;
@@ -119,7 +126,7 @@ static void increaseYaxisTest(LinkedList_Typedef* list) {
 }
 
 // updates the coordinates relative the button press if there is any.
-static void UpdateSnake(LinkedList_Typedef* list, char* statickeyPress) {
+static void UpdateSnake(doublyLinkedList_Typedef* list, char* statickeyPress) {
     static char direction = 'D';
 
     *statickeyPress = toupper(*statickeyPress);
@@ -145,30 +152,30 @@ static void UpdateSnake(LinkedList_Typedef* list, char* statickeyPress) {
     }
 
     //limit check
-    if (!limitCheck(direction, (Coord_Typedef*)(list->ListHead->data))) {
+    if (!limitCheck(direction, (Coord_Typedef*)(list->data))) {
 
         if (direction == 'W') {
 
-            move(list->ListHead, true);                         // update the list
-            ((Coord_Typedef*)(list->ListHead->data))->Y -= 1;   // update the head      
+            move(list, true);                         // update the list
+            ((Coord_Typedef*)(list->data))->Y -= 1;   // update the head      
 
         }
         else if (direction == 'S') {
 
-            move(list->ListHead, true);                         // update the list
-            ((Coord_Typedef*)(list->ListHead->data))->Y += 1;   // update the head
+            move(list, true);                         // update the list
+            ((Coord_Typedef*)(list->data))->Y += 1;   // update the head
 
         }
         else if (direction == 'A') {
 
-            move(list->ListHead, true);                         // update the list
-            ((Coord_Typedef*)(list->ListHead->data))->X -= 1;   // update the head
+            move(list, true);                         // update the list
+            ((Coord_Typedef*)(list->data))->X -= 1;   // update the head
 
         }
         else if (direction == 'D') {
 
-            move(list->ListHead, true);                         // update the list
-            ((Coord_Typedef*)(list->ListHead->data))->X += 1;   // update the head
+            move(list, true);                         // update the list
+            ((Coord_Typedef*)(list->data))->X += 1;   // update the head
         }
 
     }
@@ -194,7 +201,7 @@ static bool limitCheck(char direction,Coord_Typedef* axisData) {
 }
 
 /* listhead stays untouched */
-void move(node_Typedef* node,bool firstCall) {
+void move(doublyLinkedList_Typedef* node,bool firstCall) {
     static bool lastPtr = NULL;
     if (firstCall)
         lastPtr = false;
@@ -202,36 +209,30 @@ void move(node_Typedef* node,bool firstCall) {
     if (node->right) {
         move(node->right, false);
     } else {
-        //node->data = node->left->data;
         memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
         lastPtr = true;
         return;
     }
     if ((lastPtr) && (node->left)) {
-        //node->data = node->left->data;
         memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
     }
 
 }
-static void WriteListData_TestCode(LinkedList_Typedef* list) {
+static void WriteListData_TestCode(doublyLinkedList_Typedef* node) {
     unsigned int g = 0;
-    node_Typedef* node = NULL;
-
-    node = list->ListHead;
 
     while (node) {
-
         printf("%d    X: %d - Y:%d \n", g++, ((Coord_Typedef*)(node->data))->X, ((Coord_Typedef*)(node->data))->Y);
         node = node->right;
     }
     printf("-----------------------------\n");
 }
 /*    Draws only linkedlist  in non blocking fashion   */
-static bool snakeDrawNonBlocking(LinkedList_Typedef* list,bool eraseTheLast) {
-   static node_Typedef* node = NULL;
+static bool snakeDrawNonBlocking(doublyLinkedList_Typedef* list,bool eraseTheLast) {
+   static doublyLinkedList_Typedef* node = NULL;
 
    if (node == NULL) {
-       node = list->ListHead;
+       node = list;
    }
 
    printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, block);
@@ -250,13 +251,13 @@ static bool snakeDrawNonBlocking(LinkedList_Typedef* list,bool eraseTheLast) {
 }
 
 /*    Draws only linkedlist  in blocking fashion   */
-static bool snakeDrawBlocking(LinkedList_Typedef* list,bool eraseTheLast) {
+static bool snakeDrawBlocking(doublyLinkedList_Typedef* list,bool eraseTheLast) {
 
-    node_Typedef* node = NULL;
+    doublyLinkedList_Typedef* node = NULL;
     
     // initialize...
     if (!node) {
-        node = list->ListHead;
+        node = list;
     }
 
     // draw..
