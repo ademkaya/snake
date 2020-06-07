@@ -29,8 +29,9 @@ static const char RTCornerline = (char)187;
 static const char RBCornerline = (char)188;
 static const char LTCornerline = (char)201;
 static const char LBCornerline = (char)200;
-static const char block        = (char)148;
+static const char block        = (char)'O';
 
+static void AddSnakeNode(doublyLinkedList_Typedef* list);
 static bool snakeDrawBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
 static bool snakeDrawNonBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
 static void UpdateSnake(doublyLinkedList_Typedef* list, char* statickeyPress);
@@ -91,6 +92,7 @@ int main()
     //           list.Functions.AddSibling(headNode, &c6);
 
     uint32_t f = 0;
+    bool add = false;
     char keyPress = NULL;
     bool refresh = false;
     while (true) {
@@ -105,6 +107,7 @@ int main()
         UpdateSnake(list, &keyPress);              
         Delay();
         snakeDrawBlocking(list,true);
+
         // increaseYaxisTest(&list);
         // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
     }
@@ -112,6 +115,27 @@ int main()
 
     
 }
+
+
+static bool AddSnakeNode(doublyLinkedList_Typedef* list) {
+    bool retVal = true;
+    doublyLinkedList_Typedef* node = list;
+    AddNode(&list, NULL);
+
+    while (node->data) {
+        node = node->right;
+    }
+
+    node->data = calloc(1, sizeof(Coord_Typedef));
+
+    if (!(node->data))
+        retVal = false;
+    else
+        memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
+
+    return retVal;
+}
+
 static void Delay(void) {
     for (uint32_t a = 0; a < 15500000; a++) {
         ;
@@ -185,16 +209,16 @@ static void UpdateSnake(doublyLinkedList_Typedef* list, char* statickeyPress) {
 
 static bool limitCheck(char direction,Coord_Typedef* axisData) {
     bool retVal = false;
-    if ((direction == 'W') && (axisData->Y == Y1)) {
+    if ((direction == 'W') && (axisData->Y == Y1+1)) {
         retVal = true;
     }
-    else if ((direction == 'S') && (axisData->Y == Y2)) {
+    else if ((direction == 'S') && (axisData->Y == Y2-1)) {
         retVal = true;
     }
-    else if ((direction == 'D') && (axisData->X == X2)) {
+    else if ((direction == 'D') && (axisData->X == X2-1)) {
         retVal = true;
     }
-    else if ((direction == 'A') && (axisData->X == X1)) {
+    else if ((direction == 'A') && (axisData->X == X1+1)) {
         retVal = true;
     }
     return retVal;
