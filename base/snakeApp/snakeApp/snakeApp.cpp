@@ -12,6 +12,10 @@
 
 //#include <thread>
 
+typedef struct coord {
+    uint16_t X;
+    uint16_t Y;
+}Coord_Typedef;
 
 static const uint8_t X1 = 10;
 static const uint8_t Y1 = 10;
@@ -34,6 +38,7 @@ static char DirectionHandler(void);
 static char BlockingkeyPressDetection(void);
 static void increaseYaxisTest(LinkedList_Typedef* list);
 
+static bool limitCheck(char direction, Coord_Typedef* axisData);
 void move(node_Typedef* node,bool);
 static void WriteListData_TestCode(LinkedList_Typedef* list);
 void clearArea(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop);
@@ -42,10 +47,6 @@ static void printCharOnSpesificLocation(uint16_t X, uint16_t Y, char chr);
 static void clearScreen(void);
 static bool getChar_(char* ch);
 static void Delay(void);
-typedef struct coord {
-    uint16_t X;
-    uint16_t Y;
-}Coord_Typedef;
 
 
 Coord_Typedef c1;
@@ -143,38 +144,52 @@ static void UpdateSnake(LinkedList_Typedef* list, char* statickeyPress) {
         }
     }
 
-    if (direction == 'W') {
+    //limit check
+    if (!limitCheck(direction, (Coord_Typedef*)(list->ListHead->data))) {
 
-        move(list->ListHead, true);                         // update the list
-        if (!limitCheck(((Coord_Typedef*)(list->ListHead->data))->Y)){
-        ((Coord_Typedef*)(list->ListHead->data))->Y -= 1;   // update the head
+        if (direction == 'W') {
+
+            move(list->ListHead, true);                         // update the list
+            ((Coord_Typedef*)(list->ListHead->data))->Y -= 1;   // update the head      
+
         }
+        else if (direction == 'S') {
 
-    } else if (direction == 'S') {
-    
-        move(list->ListHead, true);                         // update the list
-        ((Coord_Typedef*)(list->ListHead->data))->Y += 1;   // update the head
+            move(list->ListHead, true);                         // update the list
+            ((Coord_Typedef*)(list->ListHead->data))->Y += 1;   // update the head
 
-    } else if (direction == 'A') {
+        }
+        else if (direction == 'A') {
 
-        move(list->ListHead, true);                         // update the list
-        ((Coord_Typedef*)(list->ListHead->data))->X -= 1;   // update the head
+            move(list->ListHead, true);                         // update the list
+            ((Coord_Typedef*)(list->ListHead->data))->X -= 1;   // update the head
 
-    } else if (direction == 'D') {
+        }
+        else if (direction == 'D') {
 
-        move(list->ListHead, true);                         // update the list
-        ((Coord_Typedef*)(list->ListHead->data))->X += 1;   // update the head
+            move(list->ListHead, true);                         // update the list
+            ((Coord_Typedef*)(list->ListHead->data))->X += 1;   // update the head
+        }
 
     }
 
     *statickeyPress = 0;  // consume the value.
 }
 
-bool limitCheck(uint32_t axisData) {
+static bool limitCheck(char direction,Coord_Typedef* axisData) {
     bool retVal = false;
-        if ((axisData == X1)|| (axisData == X2)|| (axisData == Y1)|| (axisData == Y2)) {
-            retVal = true;
-        }
+    if ((direction == 'W') && (axisData->Y == Y1)) {
+        retVal = true;
+    }
+    else if ((direction == 'S') && (axisData->Y == Y2)) {
+        retVal = true;
+    }
+    else if ((direction == 'D') && (axisData->X == X2)) {
+        retVal = true;
+    }
+    else if ((direction == 'A') && (axisData->X == X1)) {
+        retVal = true;
+    }
     return retVal;
 }
 
