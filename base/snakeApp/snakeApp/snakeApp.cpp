@@ -15,7 +15,7 @@
 
 static const uint8_t X1 = 10;
 static const uint8_t Y1 = 10;
-static const uint8_t X2 = 80;
+static const uint8_t X2 = 40;
 static const uint8_t Y2 = 40;
 
 static const char Hline = (char)205;
@@ -24,9 +24,9 @@ static const char RTCornerline = (char)187;
 static const char RBCornerline = (char)188;
 static const char LTCornerline = (char)201;
 static const char LBCornerline = (char)200;
-static const char block        = (char)219;
+static const char block        = (char)148;
 
-static bool snakeDrawBlocking(LinkedList_Typedef* list);
+static bool snakeDrawBlocking(LinkedList_Typedef* list, bool eraseTheLast);
 static bool snakeDrawNonBlocking(LinkedList_Typedef* list, bool eraseTheLast);
 static void UpdateSnake(LinkedList_Typedef* list, char* statickeyPress);
 static void frameCreation(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength, uint8_t yLength);
@@ -90,12 +90,14 @@ int main()
             keyPress = BlockingkeyPressDetection();
         }        
         
-       // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
-        //increaseYaxisTest(&list);
+        // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
+        //WriteListData_TestCode(&list);
 
-        UpdateSnake(&list, &keyPress);          
+        UpdateSnake(&list, &keyPress);              
         Delay();
-        snakeDrawNonBlocking(&list,true);
+        snakeDrawBlocking(&list,true);
+        // increaseYaxisTest(&list);
+        // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
     }
 
 
@@ -118,14 +120,8 @@ static void increaseYaxisTest(LinkedList_Typedef* list) {
 // updates the coordinates relative the button press if there is any.
 static void UpdateSnake(LinkedList_Typedef* list, char* statickeyPress) {
     static char direction = 'D';
-    static node_Typedef* node = NULL;
 
     *statickeyPress = toupper(*statickeyPress);
-
-    // *****    node assign
-    if (!node) {
-        node = list->ListHead;
-    }
 
     // *****    direction assign
     if (*statickeyPress) {
@@ -147,40 +143,40 @@ static void UpdateSnake(LinkedList_Typedef* list, char* statickeyPress) {
         }
     }
 
-
     if (direction == 'W') {
 
-      if (node == list->ListHead)
-         ((Coord_Typedef*)(node->data))->Y -= 1;
-      else 
-         ((Coord_Typedef*)(node->data))->Y = (((Coord_Typedef*)(node->left->data))->Y) + 1;
+        move(list->ListHead, true);                         // update the list
+        if (!limitCheck(((Coord_Typedef*)(list->ListHead->data))->Y)){
+        ((Coord_Typedef*)(list->ListHead->data))->Y -= 1;   // update the head
+        }
 
     } else if (direction == 'S') {
     
-        if (node == list->ListHead)
-            ((Coord_Typedef*)(node->data))->Y += 1;
-        else 
-            ((Coord_Typedef*)(node->data))->Y = (((Coord_Typedef*)(node->left->data))->Y) - 1;
-       
+        move(list->ListHead, true);                         // update the list
+        ((Coord_Typedef*)(list->ListHead->data))->Y += 1;   // update the head
+
     } else if (direction == 'A') {
 
-        if (node == list->ListHead)
-            ((Coord_Typedef*)(node->data))->X -= 1;
-        else 
-            ((Coord_Typedef*)(node->data))->X = (((Coord_Typedef*)(node->left->data))->X) + 1;
+        move(list->ListHead, true);                         // update the list
+        ((Coord_Typedef*)(list->ListHead->data))->X -= 1;   // update the head
 
     } else if (direction == 'D') {
 
-        if (node == list->ListHead)
-            ((Coord_Typedef*)(node->data))->X += 1;
-        else
-            ((Coord_Typedef*)(node->data))->X = (((Coord_Typedef*)(node->left->data))->X) - 1;
+        move(list->ListHead, true);                         // update the list
+        ((Coord_Typedef*)(list->ListHead->data))->X += 1;   // update the head
+
     }
 
-    node = node->right;
     *statickeyPress = 0;  // consume the value.
 }
 
+bool limitCheck(uint32_t axisData) {
+    bool retVal = false;
+        if ((axisData == X1)|| (axisData == X2)|| (axisData == Y1)|| (axisData == Y2)) {
+            retVal = true;
+        }
+    return retVal;
+}
 
 /* listhead stays untouched */
 void move(node_Typedef* node,bool firstCall) {
@@ -191,12 +187,16 @@ void move(node_Typedef* node,bool firstCall) {
     if (node->right) {
         move(node->right, false);
     } else {
-        node->data = node->left->data;
+        //node->data = node->left->data;
+        memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
         lastPtr = true;
         return;
     }
-    if ((lastPtr)&&(node->left))
-        node->data = node->left->data;
+    if ((lastPtr) && (node->left)) {
+        //node->data = node->left->data;
+        memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
+    }
+
 }
 static void WriteListData_TestCode(LinkedList_Typedef* list) {
     unsigned int g = 0;
@@ -209,6 +209,7 @@ static void WriteListData_TestCode(LinkedList_Typedef* list) {
         printf("%d    X: %d - Y:%d \n", g++, ((Coord_Typedef*)(node->data))->X, ((Coord_Typedef*)(node->data))->Y);
         node = node->right;
     }
+    printf("-----------------------------\n");
 }
 /*    Draws only linkedlist  in non blocking fashion   */
 static bool snakeDrawNonBlocking(LinkedList_Typedef* list,bool eraseTheLast) {
@@ -234,7 +235,7 @@ static bool snakeDrawNonBlocking(LinkedList_Typedef* list,bool eraseTheLast) {
 }
 
 /*    Draws only linkedlist  in blocking fashion   */
-static bool snakeDrawBlocking(LinkedList_Typedef* list) {
+static bool snakeDrawBlocking(LinkedList_Typedef* list,bool eraseTheLast) {
 
     node_Typedef* node = NULL;
     
@@ -247,6 +248,11 @@ static bool snakeDrawBlocking(LinkedList_Typedef* list) {
     while (node) {
         // processes
         printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, block);
+
+        if (!(node->right) && (eraseTheLast)) {
+            printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, 0);
+        }
+
         node = node->right;
     }
 
