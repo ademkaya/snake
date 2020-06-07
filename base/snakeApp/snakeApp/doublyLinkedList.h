@@ -1,10 +1,8 @@
-
-
 /*
- * File:   linkedlistLib.h
+ * File:   doublylinkedlist.h
  * Author: Adem
  *
- * Started on April 21, 2020, 6:11 PM
+ * Started on Jun , 2020, 6:11 PM
  */
 
 #ifndef __DOUBLYLINKEDLIST_H__

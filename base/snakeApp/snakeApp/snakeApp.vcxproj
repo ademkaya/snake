@@ -151,7 +151,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="doublyLinkedList.c" />
+    <ClCompile Include="print.c" />
     <ClCompile Include="snakeApp.cpp" />
+    <ClCompile Include="snakeSrc.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

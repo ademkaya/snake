@@ -21,5 +21,11 @@
     <ClCompile Include="doublyLinkedList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="snakeSrc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="print.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
