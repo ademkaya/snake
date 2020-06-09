@@ -15,10 +15,10 @@
 
 //#include <thread>
 
-static const uint8_t X1 = 10;
-static const uint8_t Y1 = 10;
-static const uint8_t X2 = 80;
-static const uint8_t Y2 = 40;
+static const uint8_t X1 = 2;
+static const uint8_t Y1 = 1;
+static const uint8_t X2 = 40;
+static const uint8_t Y2 = 20;
 
 
 Coord_Typedef c1;
@@ -28,12 +28,31 @@ Coord_Typedef c4;
 Coord_Typedef c5;
 Coord_Typedef c6;
 
+Coord_Typedef* rnd;
+
 snake_typedef* snake;
 doublyLinkedList_Typedef* list;
 int main()
 {
     InitializeSnakePtr(&snake,X1,X2,Y1,Y2);
     snake->SnakeframeCreation(X1, Y1, X2 - X1, Y2 - Y1);
+    
+
+    while(true){
+        rnd = snake->RandomPointCreate();
+
+        snake->printCharOnSpesificLocation(rnd->X, rnd->Y, 'o');
+
+        snake->Delay('A');
+
+        //snake->printCharOnSpesificLocation(rnd->X, rnd->Y, 0);
+
+    }
+
+
+
+
+
 
     c1.X = X1+10;
     c1.Y = Y1+1;
