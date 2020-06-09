@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include "snakeSrc.h"
 #include "print.h"
+#include <stdlib.h>
+#include <time.h>
 
 static const char Hline = (char)205;
 static const char Vline = (char)186;
@@ -11,6 +13,8 @@ static const char RBCornerline = (char)188;
 static const char LTCornerline = (char)201;
 static const char LBCornerline = (char)200;
 static const char block = (char)'O';
+
+Coord_Typedef randomCoord = {0,0};
 
 const uint32_t vertSpeed = 31000000;
 const uint32_t horzSpeed = 18000000;
@@ -32,6 +36,7 @@ static char SnakeDirectionHandler(char keyPress);
 static void SnakeframeCreation(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength, uint8_t yLength);
 static void WriteListData_TestCode(doublyLinkedList_Typedef* node);
 static void increaseYaxis_TestCode(doublyLinkedList_Typedef* list);
+static Coord_Typedef* RandomPointCreate(void);
 
 
 bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32_t YLow, uint32_t YHigh) {
@@ -54,6 +59,12 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
         (*ptr)->SnakeUpdate = &SnakeUpdate;
         (*ptr)->WriteListData_TestCode = &WriteListData_TestCode;
         (*ptr)->increaseYaxis_TestCode = &increaseYaxis_TestCode;
+        (*ptr)->RandomPointCreate = &RandomPointCreate;
+
+        (*ptr)->printCharOnSpesificLocation = &printCharOnSpesificLocation;
+        (*ptr)->printStringOnSpesificLocation = &printStringOnSpesificLocation;
+
+        srand(time(NULL));   // Initialization, should only be called once.
 
         X1 = XLow;
         X2 = XHigh;
@@ -62,6 +73,14 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
     }
     return retVal;
 }
+static Coord_Typedef* RandomPointCreate(void) {
+
+    randomCoord.X = X1 + (((int)rand()) % ((X2 - X1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+    randomCoord.Y = Y1 + (((int)rand()) % ((Y2 - Y1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+
+    return (&randomCoord);
+}
+
 /*Adds node on the last end of the linkedlist*/
 static bool SnakeAddNode(doublyLinkedList_Typedef* list) {
     bool retVal = true;
@@ -84,7 +103,7 @@ static bool SnakeAddNode(doublyLinkedList_Typedef* list) {
 static void Delay(char keyPress) {
     static char lastKey = 'D';
     uint32_t a = 0;
-    if ((lastKey == 'A') || (lastKey == 'D')) {
+    if ((lastKey == 'A') || (lastKey == 'D')|| (keyPress == NULL)) {
         for (a = 0; a < horzSpeed; a++) {
             ;
         }
