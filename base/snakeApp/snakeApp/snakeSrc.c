@@ -37,8 +37,8 @@ static char SnakeDirectionHandler(char keyPress);
 static void SnakeframeCreation(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength, uint8_t yLength);
 static void WriteListData_TestCode(doublyLinkedList_Typedef* node);
 static void increaseYaxis_TestCode(doublyLinkedList_Typedef* list);
-static Coord_Typedef* RandomPointCreate(void);
 static bool IsBaitEaten(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
+static Coord_Typedef* RandomPointCreate(void);
 
 bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32_t YLow, uint32_t YHigh) {
     bool retVal = true;
@@ -79,8 +79,8 @@ static Coord_Typedef* RandomPointCreate(void) {
 
     randomCoord.X = X1 + (((int)rand()) % ((X2 - X1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
     randomCoord.Y = Y1 + (((int)rand()) % ((Y2 - Y1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
-
     printCharOnSpesificLocation(randomCoord.X, randomCoord.Y, bait);
+
 
     return (&randomCoord);
 }
