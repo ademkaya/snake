@@ -37,6 +37,7 @@ extern "C" {
 		void (*WriteListData_TestCode)			(doublyLinkedList_Typedef* node);
 		void (*increaseYaxis_TestCode)			(doublyLinkedList_Typedef* list);
 
+		bool (*IsBaitEaten)						(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
 		Coord_Typedef* (*RandomPointCreate)		(void);
 		void (*printStringOnSpesificLocation)	(uint16_t X, uint16_t Y, char* str);
 		void (*printCharOnSpesificLocation)		(uint16_t X, uint16_t Y, char chr);

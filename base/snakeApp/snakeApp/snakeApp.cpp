@@ -20,7 +20,6 @@ static const uint8_t Y1 = 1;
 static const uint8_t X2 = 40;
 static const uint8_t Y2 = 20;
 
-
 Coord_Typedef c1;
 Coord_Typedef c2;
 Coord_Typedef c3;
@@ -28,7 +27,7 @@ Coord_Typedef c4;
 Coord_Typedef c5;
 Coord_Typedef c6;
 
-Coord_Typedef* rnd;
+Coord_Typedef* baitCoord;
 
 snake_typedef* snake;
 doublyLinkedList_Typedef* list;
@@ -36,21 +35,7 @@ int main()
 {
     InitializeSnakePtr(&snake,X1,X2,Y1,Y2);
     snake->SnakeframeCreation(X1, Y1, X2 - X1, Y2 - Y1);
-    
-
-    while(true){
-        rnd = snake->RandomPointCreate();
-
-        snake->printCharOnSpesificLocation(rnd->X, rnd->Y, 'o');
-
-        snake->Delay('A');
-
-        //snake->printCharOnSpesificLocation(rnd->X, rnd->Y, 0);
-
-    }
-
-
-
+    baitCoord = snake->RandomPointCreate();
 
 
 
@@ -75,28 +60,39 @@ int main()
     AddNode(&list, &c6); 
 
 
-    uint32_t f = 0;
-    bool add = false;
+
     char keyPress = NULL;
-    bool refresh = false;
+    bool baitIsEaten = false;
     while (true) {
      
         keyPress = NonBlockingKeyPressDetection();
-        // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
-        //WriteListData_TestCode(&list);
+
+
         snake->SnakeUpdate(list, keyPress);              
         snake->Delay(keyPress);
         snake->SnakeDrawBlocking(list,true);
+        if (snake->IsBaitEaten(list, baitCoord)){
+            snake->SnakeAddNode(list);
+            baitCoord = snake->RandomPointCreate();
+        }
 
-        // increaseYaxisTest(&list);
-        // clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
     }
 
 
     
 }
+ /*
+     To Do: 
+        *   Don't create random points on the points of snake
+        *   Detect self hit
+        *   Detect wall hit
+        *   multiple threads to exclude delay ...
+ */
 
 
-
+        //  clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
+        //  WriteListData_TestCode(&list);
+        //  increaseYaxisTest(&list);
+        //  clearArea(X1 + 1, X2 - 1, Y1 + 1, Y2 - 1);
 
 

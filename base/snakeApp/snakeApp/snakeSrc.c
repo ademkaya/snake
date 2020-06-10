@@ -13,11 +13,12 @@ static const char RBCornerline = (char)188;
 static const char LTCornerline = (char)201;
 static const char LBCornerline = (char)200;
 static const char block = (char)'O';
+static const char bait = (char)'o';
 
 Coord_Typedef randomCoord = {0,0};
 
-const uint32_t vertSpeed = 31000000;
-const uint32_t horzSpeed = 18000000;
+const uint32_t vertSpeed = 62000000;
+const uint32_t horzSpeed = 36000000;
 
 static uint16_t X1 = 0;
 static uint16_t X2 = 0;
@@ -26,7 +27,7 @@ static uint16_t Y2 = 0;
 
 static void Delay(char);
 static bool SnakeAddNode(doublyLinkedList_Typedef* list);
-static void SnakeUpdate(doublyLinkedList_Typedef* list, char* statickeyPress);
+static void SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress);
 static bool SnakeLimitCheck(char direction, Coord_Typedef* axisData);
        void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall);
 static bool SnakeDrawNonBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
@@ -37,7 +38,7 @@ static void SnakeframeCreation(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength
 static void WriteListData_TestCode(doublyLinkedList_Typedef* node);
 static void increaseYaxis_TestCode(doublyLinkedList_Typedef* list);
 static Coord_Typedef* RandomPointCreate(void);
-
+static bool IsBaitEaten(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
 
 bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32_t YLow, uint32_t YHigh) {
     bool retVal = true;
@@ -60,6 +61,7 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
         (*ptr)->WriteListData_TestCode = &WriteListData_TestCode;
         (*ptr)->increaseYaxis_TestCode = &increaseYaxis_TestCode;
         (*ptr)->RandomPointCreate = &RandomPointCreate;
+        (*ptr)->IsBaitEaten = &IsBaitEaten;
 
         (*ptr)->printCharOnSpesificLocation = &printCharOnSpesificLocation;
         (*ptr)->printStringOnSpesificLocation = &printStringOnSpesificLocation;
@@ -78,8 +80,17 @@ static Coord_Typedef* RandomPointCreate(void) {
     randomCoord.X = X1 + (((int)rand()) % ((X2 - X1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
     randomCoord.Y = Y1 + (((int)rand()) % ((Y2 - Y1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
 
+    printCharOnSpesificLocation(randomCoord.X, randomCoord.Y, bait);
+
     return (&randomCoord);
 }
+
+static bool IsBaitEaten(doublyLinkedList_Typedef* ptr,Coord_Typedef* baitPtr) {
+    if ((((Coord_Typedef*)(ptr->data))->X == baitPtr->X) && (((Coord_Typedef*)(ptr->data))->Y == baitPtr->Y))
+        return true;
+    return false;
+}
+
 
 /*Adds node on the last end of the linkedlist*/
 static bool SnakeAddNode(doublyLinkedList_Typedef* list) {
