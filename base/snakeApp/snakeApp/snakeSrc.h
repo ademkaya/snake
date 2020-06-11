@@ -38,7 +38,7 @@ extern "C" {
 		void (*increaseYaxis_TestCode)			(doublyLinkedList_Typedef* list);
 
 		bool (*IsBaitEaten)						(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
-		Coord_Typedef* (*RandomPointCreate)		(void);
+		Coord_Typedef* (*RandomPointCreate)		(doublyLinkedList_Typedef* list, bool putOnScreen);
 		void (*printStringOnSpesificLocation)	(uint16_t X, uint16_t Y, char* str);
 		void (*printCharOnSpesificLocation)		(uint16_t X, uint16_t Y, char chr);
 		char (*BlockingkeyPressDetection)		(void);

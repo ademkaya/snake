@@ -20,14 +20,8 @@ static const uint8_t Y1 = 1;
 static const uint8_t X2 = 40;
 static const uint8_t Y2 = 20;
 
-Coord_Typedef c1;
-Coord_Typedef c2;
-Coord_Typedef c3;
-Coord_Typedef c4;
-Coord_Typedef c5;
-Coord_Typedef c6;
-
-Coord_Typedef* baitCoord;
+Coord_Typedef baitCoord;
+Coord_Typedef nodeStartCoord;
 
 snake_typedef* snake;
 doublyLinkedList_Typedef* list;
@@ -35,29 +29,11 @@ int main()
 {
     InitializeSnakePtr(&snake,X1,X2,Y1,Y2);
     snake->SnakeframeCreation(X1, Y1, X2 - X1, Y2 - Y1);
-    baitCoord = snake->RandomPointCreate();
+    nodeStartCoord = *(snake->RandomPointCreate(list,false));
+    baitCoord      = *(snake->RandomPointCreate(list,true));
+    
+    AddNode(&list, &nodeStartCoord);
 
-
-
-    c1.X = X1+10;
-    c1.Y = Y1+1;
-    c2.X = X1 + 9;
-    c2.Y = c1.Y;
-    c3.X = X1 + 8;
-    c3.Y = c1.Y;
-    c4.X = X1 + 7;
-    c4.Y = c1.Y;
-    c5.X = X1 + 6;
-    c5.Y = c1.Y;
-    c6.X = X1 + 5;
-    c6.Y = c1.Y;
-
-    AddNode(&list, &c1); 
-    AddNode(&list, &c2); 
-    AddNode(&list, &c3); 
-    AddNode(&list, &c4); 
-    AddNode(&list, &c5); 
-    AddNode(&list, &c6); 
 
 
 
@@ -71,9 +47,9 @@ int main()
         snake->SnakeUpdate(list, keyPress);              
         snake->Delay(keyPress);
         snake->SnakeDrawBlocking(list,true);
-        if (snake->IsBaitEaten(list, baitCoord)){
+        if (snake->IsBaitEaten(list, &baitCoord)){
             snake->SnakeAddNode(list);
-            baitCoord = snake->RandomPointCreate();
+            baitCoord = *(snake->RandomPointCreate(list,true));
         }
 
     }
@@ -83,7 +59,7 @@ int main()
 }
  /*
      To Do: 
-        *   Don't create random points on the points of snake
+        *   Don't create random points on the points of snake -- done
         *   Detect self hit
         *   Detect wall hit
         *   multiple threads to exclude delay ...

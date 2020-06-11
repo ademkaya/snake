@@ -38,7 +38,9 @@ static void SnakeframeCreation(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength
 static void WriteListData_TestCode(doublyLinkedList_Typedef* node);
 static void increaseYaxis_TestCode(doublyLinkedList_Typedef* list);
 static bool IsBaitEaten(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
-static Coord_Typedef* RandomPointCreate(void);
+static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list, bool putOnScreen);
+static uint16_t getListCount(doublyLinkedList_Typedef* list);
+
 
 bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32_t YLow, uint32_t YHigh) {
     bool retVal = true;
@@ -75,14 +77,41 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
     }
     return retVal;
 }
-static Coord_Typedef* RandomPointCreate(void) {
+static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list,bool putOnScreen) {
 
-    randomCoord.X = X1 + (((int)rand()) % ((X2 - X1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
-    randomCoord.Y = Y1 + (((int)rand()) % ((Y2 - Y1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
-    printCharOnSpesificLocation(randomCoord.X, randomCoord.Y, bait);
+    doublyLinkedList_Typedef* node = list;
+    bool matched;
+    do
+    {
+        matched = false;
+        randomCoord.X = X1 + (((int)rand()) % ((X2 - X1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+        randomCoord.Y = Y1 + (((int)rand()) % ((Y2 - Y1) - 1)) + 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+        while (node) {
+            if ((randomCoord.X == ((Coord_Typedef*)(node->data))->X) && (randomCoord.Y == ((Coord_Typedef*)(node->data))->Y)) {
+                matched = true;
+                node = list;
+                break;
+            } else {
+                node = node->right;
+            }
+        }
+        //matched
+    } while (matched);
 
+    if(putOnScreen)
+        printCharOnSpesificLocation(randomCoord.X, randomCoord.Y, bait);
 
     return (&randomCoord);
+}
+
+static uint16_t getListCount(doublyLinkedList_Typedef* list) {
+    doublyLinkedList_Typedef* node = list;
+    uint16_t cntr = 0;
+        while (node) {
+            cntr += 1;
+            node = node->right;
+        }
+    return cntr;
 }
 
 static bool IsBaitEaten(doublyLinkedList_Typedef* ptr,Coord_Typedef* baitPtr) {
@@ -210,7 +239,8 @@ void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall) {
         SnakeMove(node->right, false);
     }
     else {
-        memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
+        if (node->left)
+            memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
         lastPtr = true;
         return;
     }
