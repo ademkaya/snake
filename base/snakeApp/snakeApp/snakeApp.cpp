@@ -21,7 +21,7 @@ static const uint8_t X2 = 40;
 static const uint8_t Y2 = 20;
 
 Coord_Typedef baitCoord;
-Coord_Typedef nodeStartCoord;
+Coord_Typedef nodeStartCoord1;
 
 snake_typedef* snake;
 doublyLinkedList_Typedef* list;
@@ -29,13 +29,12 @@ int main()
 {
     InitializeSnakePtr(&snake,X1,X2,Y1,Y2);
     snake->SnakeframeCreation(X1, Y1, X2 - X1, Y2 - Y1);
-    nodeStartCoord = *(snake->RandomPointCreate(list,false));
+    nodeStartCoord1 = *(snake->RandomPointCreate(list,false));
     baitCoord      = *(snake->RandomPointCreate(list,true));
     
-    AddNode(&list, &nodeStartCoord);
+    AddNode(&list, &nodeStartCoord1);
 
-
-
+    snake->SnakeDrawBlocking(list, false);
 
     char keyPress = NULL;
     bool baitIsEaten = false;
@@ -46,20 +45,21 @@ int main()
 
         snake->SnakeUpdate(list, keyPress);              
         snake->Delay(keyPress);
-        snake->SnakeDrawBlocking(list,true);
+        snake->SnakeDrawBlocking(list,false);
         if (snake->IsBaitEaten(list, &baitCoord)){
             snake->SnakeAddNode(list);
             baitCoord = *(snake->RandomPointCreate(list,true));
         }
-
+        snake->EraseTheLast(list);
     }
 
-
+    // sonu silme yanlış siliyor.
     
 }
  /*
      To Do: 
         *   Don't create random points on the points of snake -- done
+        *   eats out the last point???
         *   Detect self hit
         *   Detect wall hit
         *   multiple threads to exclude delay ...

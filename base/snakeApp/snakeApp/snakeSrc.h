@@ -36,6 +36,7 @@ extern "C" {
 		void (*SnakeframeCreation)				(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength, uint8_t yLength);
 		void (*WriteListData_TestCode)			(doublyLinkedList_Typedef* node);
 		void (*increaseYaxis_TestCode)			(doublyLinkedList_Typedef* list);
+		void (*EraseTheLast)					(doublyLinkedList_Typedef* list);
 
 		bool (*IsBaitEaten)						(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
 		Coord_Typedef* (*RandomPointCreate)		(doublyLinkedList_Typedef* list, bool putOnScreen);

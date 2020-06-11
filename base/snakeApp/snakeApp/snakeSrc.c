@@ -18,7 +18,7 @@ static const char bait = (char)'o';
 Coord_Typedef randomCoord = {0,0};
 
 const uint32_t vertSpeed = 62000000;
-const uint32_t horzSpeed = 36000000;
+const uint32_t horzSpeed = 32000000;
 
 static uint16_t X1 = 0;
 static uint16_t X2 = 0;
@@ -40,7 +40,7 @@ static void increaseYaxis_TestCode(doublyLinkedList_Typedef* list);
 static bool IsBaitEaten(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
 static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list, bool putOnScreen);
 static uint16_t getListCount(doublyLinkedList_Typedef* list);
-
+static void EraseTheLast(doublyLinkedList_Typedef* list);
 
 bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32_t YLow, uint32_t YHigh) {
     bool retVal = true;
@@ -64,7 +64,7 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
         (*ptr)->increaseYaxis_TestCode = &increaseYaxis_TestCode;
         (*ptr)->RandomPointCreate = &RandomPointCreate;
         (*ptr)->IsBaitEaten = &IsBaitEaten;
-
+        (*ptr)->EraseTheLast = &EraseTheLast;
         (*ptr)->printCharOnSpesificLocation = &printCharOnSpesificLocation;
         (*ptr)->printStringOnSpesificLocation = &printStringOnSpesificLocation;
 
@@ -237,13 +237,13 @@ void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall) {
 
     if (node->right) {
         SnakeMove(node->right, false);
-    }
-    else {
+    }else {
         if (node->left)
             memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
         lastPtr = true;
         return;
     }
+
     if ((lastPtr) && (node->left)) {
         memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
     }
@@ -287,12 +287,20 @@ static bool SnakeDrawBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast)
         if (!(node->right) && (eraseTheLast)) {
             printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, 0);
         }
-
         node = node->right;
     }
 
     return true;
 }
+static void EraseTheLast(doublyLinkedList_Typedef* list) {
+    doublyLinkedList_Typedef* node = list;
+
+    while (node->right) {
+        node = node->right;
+    }
+    printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, 0);
+}
+
 static void SnakeClearArea(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop) {
     uint16_t xtemp = 0;
     uint16_t ytemp = 0;
