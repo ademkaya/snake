@@ -17,7 +17,7 @@ static const char bait = (char)'o';
 
 Coord_Typedef randomCoord = {0,0};
 
-const uint32_t vertSpeed = 62000000;
+const uint32_t vertSpeed = 30000000;
 const uint32_t horzSpeed = 32000000;
 
 static uint16_t X1 = 0;
@@ -27,9 +27,9 @@ static uint16_t Y2 = 0;
 
 static void Delay(char);
 static bool SnakeAddNode(doublyLinkedList_Typedef* list);
-static void SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress);
+static Error_Typedef SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress);
 static bool SnakeLimitCheck(char direction, Coord_Typedef* axisData);
-       void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall);
+static void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall);
 static bool SnakeDrawNonBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
 static bool SnakeDrawBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
 static void SnakeClearArea(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop);
@@ -40,7 +40,7 @@ static void increaseYaxis_TestCode(doublyLinkedList_Typedef* list);
 static bool IsBaitEaten(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
 static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list, bool putOnScreen);
 static uint16_t getListCount(doublyLinkedList_Typedef* list);
-static void EraseTheLast(doublyLinkedList_Typedef* list);
+static void CalcEraseTheLast(doublyLinkedList_Typedef* list, bool action);
 
 bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32_t YLow, uint32_t YHigh) {
     bool retVal = true;
@@ -55,16 +55,14 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
         (*ptr)->SnakeClearArea = &SnakeClearArea;
         (*ptr)->SnakeDirectionHandler = &SnakeDirectionHandler;
         (*ptr)->SnakeDrawBlocking = &SnakeDrawBlocking;
-        (*ptr)->SnakeDrawNonBlocking = &SnakeDrawNonBlocking;
         (*ptr)->SnakeframeCreation = &SnakeframeCreation;
         (*ptr)->SnakeLimitCheck = &SnakeLimitCheck;
-        (*ptr)->SnakeMove = &SnakeMove;
         (*ptr)->SnakeUpdate = &SnakeUpdate;
         (*ptr)->WriteListData_TestCode = &WriteListData_TestCode;
         (*ptr)->increaseYaxis_TestCode = &increaseYaxis_TestCode;
         (*ptr)->RandomPointCreate = &RandomPointCreate;
         (*ptr)->IsBaitEaten = &IsBaitEaten;
-        (*ptr)->EraseTheLast = &EraseTheLast;
+        (*ptr)->CalcEraseTheLast = &CalcEraseTheLast;
         (*ptr)->printCharOnSpesificLocation = &printCharOnSpesificLocation;
         (*ptr)->printStringOnSpesificLocation = &printStringOnSpesificLocation;
 
@@ -77,6 +75,7 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
     }
     return retVal;
 }
+
 static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list,bool putOnScreen) {
 
     doublyLinkedList_Typedef* node = list;
@@ -141,14 +140,14 @@ static bool SnakeAddNode(doublyLinkedList_Typedef* list) {
     return retVal;
 }
 static void Delay(char keyPress) {
-    static char lastKey = 'D';
+    static char lastKey = (char)'D';
     uint32_t a = 0;
-    if ((lastKey == 'A') || (lastKey == 'D')|| (keyPress == NULL)) {
+    if ((lastKey == (char)'A') || (lastKey == (char)'D')|| (keyPress == (char)0)) {
         for (a = 0; a < horzSpeed; a++) {
             ;
         }
     }
-    if ((lastKey == 'S') || (lastKey == 'W')) {
+    if ((lastKey == (char)'S') || (lastKey == (char)'W')) {
         for (a = 0; a < vertSpeed; a++) {
             ;
         }
@@ -157,24 +156,24 @@ static void Delay(char keyPress) {
     if (keyPress!=0)
         lastKey = toupper(keyPress);
 }
-static void SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress) {
-    static char direction = 'D';
-
+static Error_Typedef SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress) {
+    static char direction = (char)'D';
+    Error_Typedef err = NoError;
     statickeyPress = toupper(statickeyPress);
 
     // *****    direction assign
     if (statickeyPress) {
         bool assign = false;
-        if ((statickeyPress == 'W') && (direction != 'S')) {
+        if ((statickeyPress == (char)'W') && (direction != (char)'S')) {
             assign = true;
         }
-        if ((statickeyPress == 'S') && (direction != 'W')) {
+        if ((statickeyPress == (char)'S') && (direction != (char)'W')) {
             assign = true;
         }
-        if ((statickeyPress == 'A') && (direction != 'D')) {
+        if ((statickeyPress == (char)'A') && (direction != (char)'D')) {
             assign = true;
         }
-        if ((statickeyPress == 'D') && (direction != 'A')) {
+        if ((statickeyPress == (char)'D') && (direction != (char)'A')) {
             assign = true;
         }
         if (assign) {
@@ -185,32 +184,37 @@ static void SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress) {
     //limit check
     if (!SnakeLimitCheck(direction, (Coord_Typedef*)(list->data))) {
 
-        if (direction == 'W') {
+        if (direction == (char)'W') {
 
             SnakeMove(list, true);                    // update the list
             ((Coord_Typedef*)(list->data))->Y -= 1;   // update the head      
 
         }
-        else if (direction == 'S') {
+        else if (direction == (char)'S') {
 
             SnakeMove(list, true);                    // update the list
             ((Coord_Typedef*)(list->data))->Y += 1;   // update the head
 
         }
-        else if (direction == 'A') {
+        else if (direction == (char)'A') {
 
             SnakeMove(list, true);                    // update the list
             ((Coord_Typedef*)(list->data))->X -= 1;   // update the head
 
         }
-        else if (direction == 'D') {
+        else if (direction == (char)'D') {
 
-            SnakeMove(list, true);                    // update the list
+            SnakeMove(list, true);           // update the list
             ((Coord_Typedef*)(list->data))->X += 1;   // update the head
         }
-
     }
-    // there is no need to zero the keypress, it is going to clear in next turn if nothing detected.
+    else {
+        err = WallHit;
+    }
+
+    // self hit detection comes here.
+
+    return err;
 }
 static bool SnakeLimitCheck(char direction, Coord_Typedef* axisData) {
     bool retVal = false;
@@ -229,11 +233,12 @@ static bool SnakeLimitCheck(char direction, Coord_Typedef* axisData) {
     return retVal;
 }
 /*recursive*/
-void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall) {
-    static bool lastPtr;
+void  SnakeMove(doublyLinkedList_Typedef* node, bool firstCall) {
+    static bool lastPtr;    
 
-    if (firstCall)
+    if (firstCall) {
         lastPtr = false;
+    }
 
     if (node->right) {
         SnakeMove(node->right, false);
@@ -247,28 +252,6 @@ void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall) {
     if ((lastPtr) && (node->left)) {
         memcpy(node->data, node->left->data, sizeof(Coord_Typedef));
     }
-
-}
-static bool SnakeDrawNonBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast) {
-    static doublyLinkedList_Typedef* node = NULL;
-
-    if (node == NULL) {
-        node = list;
-    }
-
-    printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, block);
-
-
-    if (!(node->right) && (eraseTheLast)) {
-        printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, 0);
-    }
-
-    node = node->right;
-
-    if (!node)
-        return true;
-
-    return false;
 }
 static bool SnakeDrawBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast) {
 
@@ -292,13 +275,19 @@ static bool SnakeDrawBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast)
 
     return true;
 }
-static void EraseTheLast(doublyLinkedList_Typedef* list) {
+static void CalcEraseTheLast(doublyLinkedList_Typedef* list, bool action) {
     doublyLinkedList_Typedef* node = list;
-
-    while (node->right) {
-        node = node->right;
+    static Coord_Typedef lastCoord = { 0,0 };
+    
+    if (!action) {
+        while (node->right) {
+            node = node->right;
+        }
+        memcpy(&lastCoord, node->data, sizeof(Coord_Typedef));
+    } else {
+        printCharOnSpesificLocation(lastCoord.X, lastCoord.Y, 0);
     }
-    printCharOnSpesificLocation(((Coord_Typedef*)(node)->data)->X, ((Coord_Typedef*)(node)->data)->Y, 0);
+
 }
 
 static void SnakeClearArea(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop) {

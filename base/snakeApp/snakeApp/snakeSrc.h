@@ -17,6 +17,11 @@
 extern "C" {
 #endif
 
+	typedef enum Error {
+		WallHit=1,
+		SelfHit,
+		NoError
+	}Error_Typedef;
 
 	typedef struct Coord {
 		uint16_t X;
@@ -24,25 +29,23 @@ extern "C" {
 	}Coord_Typedef;
 
 	typedef struct snake {
-		void (*Delay)							(char);
-		bool (*SnakeAddNode)					(doublyLinkedList_Typedef* list);
-		void (*SnakeUpdate)						(doublyLinkedList_Typedef* list, char statickeyPress);
-		bool (*SnakeLimitCheck)					(char direction, Coord_Typedef* axisData);
-		void (*SnakeMove)						(doublyLinkedList_Typedef* node, bool firstCall);
-		bool (*SnakeDrawNonBlocking)			(doublyLinkedList_Typedef* list, bool eraseTheLast);
-		bool (*SnakeDrawBlocking)				(doublyLinkedList_Typedef* list, bool eraseTheLast);
-		void (*SnakeClearArea)					(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop);
-		char (*SnakeDirectionHandler)			(char keyPress);
-		void (*SnakeframeCreation)				(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength, uint8_t yLength);
-		void (*WriteListData_TestCode)			(doublyLinkedList_Typedef* node);
-		void (*increaseYaxis_TestCode)			(doublyLinkedList_Typedef* list);
-		void (*EraseTheLast)					(doublyLinkedList_Typedef* list);
+		void						(*Delay)							(char);
+		bool						(*SnakeAddNode)						(doublyLinkedList_Typedef* list);
+		Error_Typedef				(*SnakeUpdate)						(doublyLinkedList_Typedef* list, char statickeyPress);
+		bool						(*SnakeLimitCheck)					(char direction, Coord_Typedef* axisData);
+		bool						(*SnakeDrawBlocking)				(doublyLinkedList_Typedef* list, bool eraseTheLast);
+		void						(*SnakeClearArea)					(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop);
+		char						(*SnakeDirectionHandler)			(char keyPress);
+		void						(*SnakeframeCreation)				(uint8_t xOrigin, uint8_t yOrigin, uint8_t xLength, uint8_t yLength);
+		void						(*WriteListData_TestCode)			(doublyLinkedList_Typedef* node);
+		void						(*increaseYaxis_TestCode)			(doublyLinkedList_Typedef* list);
+		void						(*CalcEraseTheLast)					(doublyLinkedList_Typedef* list, bool action);
 
-		bool (*IsBaitEaten)						(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
-		Coord_Typedef* (*RandomPointCreate)		(doublyLinkedList_Typedef* list, bool putOnScreen);
-		void (*printStringOnSpesificLocation)	(uint16_t X, uint16_t Y, char* str);
-		void (*printCharOnSpesificLocation)		(uint16_t X, uint16_t Y, char chr);
-		char (*BlockingkeyPressDetection)		(void);
+		bool						(*IsBaitEaten)						(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
+		Coord_Typedef*				(*RandomPointCreate)				(doublyLinkedList_Typedef* list, bool putOnScreen);
+		void						(*printStringOnSpesificLocation)	(uint16_t X, uint16_t Y, char* str);
+		void						(*printCharOnSpesificLocation)		(uint16_t X, uint16_t Y, char chr);
+		char						(*BlockingkeyPressDetection)		(void);
 	}snake_typedef;
 
 
