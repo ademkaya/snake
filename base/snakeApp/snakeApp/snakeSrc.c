@@ -13,7 +13,7 @@ static const char RBCornerline = (char)188;
 static const char LTCornerline = (char)201;
 static const char LBCornerline = (char)200;
 static const char block = (char)'O';
-static const char bait = (char)'o';
+static const char bait = (char)'x';
 
 
 Coord_Typedef randomCoord = {0,0};
