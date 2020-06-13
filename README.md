@@ -1,0 +1,2 @@
+# snake
+written in C
