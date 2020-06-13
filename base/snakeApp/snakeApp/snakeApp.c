@@ -23,7 +23,6 @@ Coord_Typedef nodeStartCoord1;
 snake_typedef* snake;
 doublyLinkedList_Typedef* list;
 Coord_Typedef lastPtr           = {0,0};
-Error_Typedef err               = NoError;
 int main()
 {
     InitializeSnakePtr(&snake, X1, X2, Y1, Y2);
@@ -35,26 +34,32 @@ int main()
 
     snake->SnakeDrawBlocking(list, false);
 
-    char keyPress = NULL;
-    bool baitIsEaten = false;
-    err = NoError;
+    char keyPress = 0;
+
     while (true) {
 
         keyPress = NonBlockingKeyPressDetection();
 
-        snake->CalcEraseTheLast(list, false);                       /* gets the end coordinate of the snake */
+        snake->CalcEraseTheLast(list, false);                            /* gets the end coordinate of the snake */
 
-        err = snake->SnakeUpdate(list, keyPress);
+        snake->SnakeUpdate(list, keyPress);
         snake->Delay(keyPress);
         snake->SnakeDrawBlocking(list, false);
+
+        if (snake->IsSelfHit()) {
+            ;//comes here.
+        }
+
         if (snake->IsBaitEaten(list, &baitCoord)) {
             snake->SnakeAddNode(list);
             baitCoord = *(snake->RandomPointCreate(list, true));
         }
 
-        if (err == NoError)
+        if (!snake->IsWallHit()) {
             snake->CalcEraseTheLast(list, true);                        /* erase the last coordinate ,which get previously, from the screen */
-
+        } else {
+            ;// comes here.
+        }
 
     }
 
@@ -63,7 +68,7 @@ int main()
      To Do: 
         *   Don't create random points on the points of snake   - done
         *   eats out the last point???                          - corrected
-        *   Detect self hit                                     - ...
+        *   Detect self hit                                     - done
         *   Detect wall hit                                     - done
         *   multiple threads to exclude delay                   - ...
         *   score will be added                                 - ...

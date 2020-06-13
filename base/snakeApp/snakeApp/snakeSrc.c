@@ -15,6 +15,7 @@ static const char LBCornerline = (char)200;
 static const char block = (char)'O';
 static const char bait = (char)'o';
 
+
 Coord_Typedef randomCoord = {0,0};
 
 const uint32_t vertSpeed = 30000000;
@@ -27,10 +28,9 @@ static uint16_t Y2 = 0;
 
 static void Delay(char);
 static bool SnakeAddNode(doublyLinkedList_Typedef* list);
-static Error_Typedef SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress);
+static void SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress);
 static bool SnakeLimitCheck(char direction, Coord_Typedef* axisData);
 static void SnakeMove(doublyLinkedList_Typedef* node, bool firstCall);
-static bool SnakeDrawNonBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
 static bool SnakeDrawBlocking(doublyLinkedList_Typedef* list, bool eraseTheLast);
 static void SnakeClearArea(uint16_t XStart, uint16_t XStop, uint16_t YStart, uint16_t YStop);
 static char SnakeDirectionHandler(char keyPress);
@@ -41,6 +41,12 @@ static bool IsBaitEaten(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
 static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list, bool putOnScreen);
 static uint16_t getListCount(doublyLinkedList_Typedef* list);
 static void CalcEraseTheLast(doublyLinkedList_Typedef* list, bool action);
+static bool SelfHitCheck(doublyLinkedList_Typedef* list);
+
+static bool SelfHit;
+static bool WallHit;
+static bool IsSelfHit(void);
+static bool IsWallHit(void);
 
 bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32_t YLow, uint32_t YHigh) {
     bool retVal = true;
@@ -65,6 +71,9 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
         (*ptr)->CalcEraseTheLast = &CalcEraseTheLast;
         (*ptr)->printCharOnSpesificLocation = &printCharOnSpesificLocation;
         (*ptr)->printStringOnSpesificLocation = &printStringOnSpesificLocation;
+        
+        (*ptr)->IsWallHit = &IsWallHit;
+        (*ptr)->IsSelfHit = &IsSelfHit;
 
         srand(time(NULL));   // Initialization, should only be called once.
 
@@ -76,6 +85,26 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
     return retVal;
 }
 
+static bool SelfHitCheck(doublyLinkedList_Typedef* list) {
+    doublyLinkedList_Typedef* node = list;
+    bool hit = false;
+    while (node->right) {
+        node = node->right;     // get the next node imm. right after the head
+
+        if ((((Coord_Typedef*)(node->data))->X == ((Coord_Typedef*)(list->data))->X) && (((Coord_Typedef*)(node->data))->Y == ((Coord_Typedef*)(list->data))->Y)) {
+            hit = true;
+        }
+    }
+    return hit;
+}
+bool IsSelfHit(void)
+{
+    return SelfHit;
+}
+bool IsWallHit(void)
+{
+    return WallHit;
+}
 static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list,bool putOnScreen) {
 
     doublyLinkedList_Typedef* node = list;
@@ -139,6 +168,7 @@ static bool SnakeAddNode(doublyLinkedList_Typedef* list) {
 
     return retVal;
 }
+
 static void Delay(char keyPress) {
     static char lastKey = (char)'D';
     uint32_t a = 0;
@@ -156,9 +186,9 @@ static void Delay(char keyPress) {
     if (keyPress!=0)
         lastKey = toupper(keyPress);
 }
-static Error_Typedef SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress) {
-    static char direction = (char)'D';
-    Error_Typedef err = NoError;
+
+static void SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyPress) {
+    static char direction = (char)'D';    
     statickeyPress = toupper(statickeyPress);
 
     // *****    direction assign
@@ -183,7 +213,9 @@ static Error_Typedef SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyP
 
     //limit check
     if (!SnakeLimitCheck(direction, (Coord_Typedef*)(list->data))) {
-
+        
+        WallHit = false;
+        
         if (direction == (char)'W') {
 
             SnakeMove(list, true);                    // update the list
@@ -209,12 +241,10 @@ static Error_Typedef SnakeUpdate(doublyLinkedList_Typedef* list, char statickeyP
         }
     }
     else {
-        err = WallHit;
+        WallHit = true;
     }
 
-    // self hit detection comes here.
-
-    return err;
+    SelfHit = SelfHitCheck(list);
 }
 static bool SnakeLimitCheck(char direction, Coord_Typedef* axisData) {
     bool retVal = false;
