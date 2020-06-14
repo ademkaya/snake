@@ -10,22 +10,25 @@ bool AddNode(doublyLinkedList_Typedef** ptr,void* data) {
 
 	if (*ptr==NULL) {
 		*ptr = calloc(1, sizeof(doublyLinkedList_Typedef));
-		if (!(*ptr))
+		if (!(*ptr)) {
 			retVal = false;
-		else
+		}else {
 			statPtr = *ptr;
 			(*ptr)->data = data;
-	} else {
+		}
+	}
+	else {
 		leftHolder = *ptr;
 		while (leftHolder->right) {
 			leftHolder = leftHolder->right;
 		}
 		leftHolder->right = calloc(1, sizeof(doublyLinkedList_Typedef));
-		if (!(leftHolder->right))
+		if (!(leftHolder->right)){
 			retVal = false;
-		else
-		(leftHolder->right)->left = leftHolder;
-		(leftHolder->right)->data = data;
+		} else {
+			(leftHolder->right)->left = leftHolder;
+			(leftHolder->right)->data = data;
+		}
 	}
 
 	return retVal;
