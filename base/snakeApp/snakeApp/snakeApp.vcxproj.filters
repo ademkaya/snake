@@ -15,16 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="doublyLinkedList.c">
+    <ClCompile Include="..\src\doublyLinkedList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="snakeSrc.c">
+    <ClCompile Include="..\src\print.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="print.c">
+    <ClCompile Include="..\src\snakeApp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="snakeApp.c">
+    <ClCompile Include="..\src\snakeSrc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
