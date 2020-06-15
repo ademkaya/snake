@@ -22,7 +22,7 @@ typedef struct node {
 
 
 bool AddNode(doublyLinkedList_Typedef** listPtr, void* data);
-
+void DeleteSiblings(doublyLinkedList_Typedef** node, bool firstCall);
 
 #ifdef __cplusplus
 }

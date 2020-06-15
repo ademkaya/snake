@@ -1,4 +1,4 @@
-﻿// snakeApp.c : This file contains the 'main' function. Program execution begins and ends there.
+// snakeApp.c : This file contains the 'main' function. Program execution begins and ends there.
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,8 +13,8 @@
 
 static const uint8_t X1 = 2;
 static const uint8_t Y1 = 1;
-static const uint8_t X2 = 80;
-static const uint8_t Y2 = 40;
+static const uint8_t X2 = 40;
+static const uint8_t Y2 = 20;
 static Coord_Typedef scoreStrCoord = { 0,0 };
 static Coord_Typedef BaitStrCoord = { 0,0 };
 
@@ -27,6 +27,8 @@ Coord_Typedef lastPtr           = {0,0};
 
 static uint16_t baitsEaten = 0;
 static uint32_t Score = 0;
+static char EndGame(char type);
+static char ProceedEndGame(char endval, Coord_Typedef* ScoreStrCoord, Coord_Typedef* BaitStrCoord);
 static void ScoreBoardUpdate(Coord_Typedef* ScoreStrCoord, Coord_Typedef* BaitStrCoord, uint16_t baitsEaten, uint32_t score);       // will be moved in snakeSrc.c
 int main()
 {
@@ -52,7 +54,8 @@ int main()
     snake->SnakeDrawBlocking(list, false);
 
     char keyPress = 0;
-
+    char endval = 0;
+    char proceedVal = 0;
     while (true) {
 
         keyPress = NonBlockingKeyPressDetection();
@@ -65,6 +68,11 @@ int main()
 
         if (snake->IsSelfHit()) {
             ; // game finish flag comes here.
+            endval = EndGame(0);
+            proceedVal = ProceedEndGame(endval, &scoreStrCoord, &BaitStrCoord);
+            if (proceedVal == 0)
+                break;
+
         }
 
         if (snake->IsBaitEaten(list, &baitCoord)) {
@@ -85,13 +93,56 @@ int main()
             snake->CalcEraseTheLast(list, true);                        /* erase the last coordinate ,which get previously, from the screen */
         } else {
             ;   // game finish flag comes here.
+            endval = EndGame(0);
+            proceedVal = ProceedEndGame(endval, &scoreStrCoord, &BaitStrCoord);
+            if (proceedVal == 0)
+                break;
         }
 
         if (!snake->IsWallHit()&& !snake->IsSelfHit())
             ScoreBoardUpdate(&scoreStrCoord,&BaitStrCoord,baitsEaten,Score);
     }
 
+
+    return 0;
 }
+static char ProceedEndGame(char endval, Coord_Typedef* ScoreStrCoord, Coord_Typedef* BaitStrCoord) {
+    char retVal = 0xFF;
+
+    if (endval == 'Q') {
+        retVal = 0;
+    }
+    if (endval == 'A') {
+        baitsEaten = 0;
+        Score = 0;
+        // delete the tail
+        DeleteSiblings(&list, true);
+        // clear the screen once again
+        snake->SnakeClearArea(X1+1 , X2 , Y1+1 , Y2 );
+        snake->printStringOnSpesificLocation(ScoreStrCoord->X + 8, ScoreStrCoord->Y,&"         ");
+        snake->printStringOnSpesificLocation(BaitStrCoord->X + 7, BaitStrCoord->Y, &"     ");
+        // assing a random coodinate
+        nodeStartCoord1 = *(snake->RandomPointCreate(list, false));
+        baitCoord = *(snake->RandomPointCreate(list, true));
+
+    }
+    return retVal;
+}
+static char EndGame(char type) {
+    char retVal = 0;
+    snake->SnakeClearArea(X1 + 1, X2, Y1 + 1, Y2);
+    snake->printStringOnSpesificLocation(X1+((X2-X1)/3) + 1, (Y1 + (Y2 - Y1) / 2), (char*)&"END GAME?");
+    snake->printStringOnSpesificLocation(X1+((X2 - X1) / 3) + 1, 1+(Y1 + (Y2 - Y1) / 2), (char*)&"Quit: Q , Again: A");
+    char keyPress = BlockingkeyPressDetection();
+    keyPress = toupper(keyPress);
+    if (keyPress == 'Q')
+        retVal = 'Q';
+    if (keyPress == 'A')
+        retVal = 'A';
+
+    return retVal;
+}
+
 static void ScoreBoardUpdate(Coord_Typedef* ScoreStrCoord, Coord_Typedef* BaitStrCoord, uint16_t baitsEaten, uint32_t score) {
     char chrscore[10];
     char chrbait[5];
@@ -110,7 +161,8 @@ static void ScoreBoardUpdate(Coord_Typedef* ScoreStrCoord, Coord_Typedef* BaitSt
         *   Detect wall hit                                     - done
         *   multiple threads to exclude delay                   - ...
         *   score will be added                                 - done
-        *   end of game because of collision                    - ...
+        *   end of game because of collision                    - done 
+        *   border crossing, collison detection                 - done
         *   successfully completed game detection               - ...
         *   sometimes bait doesnt come up even tough there is enough place - ... inspect
         *   portability issue will be considered                - ...
