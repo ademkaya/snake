@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "print.h"
 #include "snakeSrc.h"
@@ -77,11 +78,13 @@ int main()
 
         if (snake->IsBaitEaten(list, &baitCoord)) {
             snake->SnakeAddNode(list);
-            baitCoord = *(snake->RandomPointCreate(list, true));
+            baitCoord = *(snake->RandomPointCreate(list, true));            
 
             if (!snake->IsWallHit() && !snake->IsSelfHit()) {
                 baitsEaten += 1;
                 Score += 1;
+                /* speed update */
+                snake->AdjustSpeed(baitsEaten,false);
             }
 
         } else {
@@ -113,14 +116,17 @@ static char ProceedEndGame(char endval, Coord_Typedef* ScoreStrCoord, Coord_Type
         retVal = 0;
     }
     if (endval == 'A') {
+        /*resets the speed variables*/
+        snake->AdjustSpeed(0, true);
+
         baitsEaten = 0;
         Score = 0;
         // delete the tail
         DeleteSiblings(&list, true);
         // clear the screen once again
         snake->SnakeClearArea(X1+1 , X2 , Y1+1 , Y2 );
-        snake->printStringOnSpesificLocation(ScoreStrCoord->X + 8, ScoreStrCoord->Y,&"         ");
-        snake->printStringOnSpesificLocation(BaitStrCoord->X + 7, BaitStrCoord->Y, &"     ");
+        snake->printStringOnSpesificLocation(ScoreStrCoord->X + 8, ScoreStrCoord->Y,(char*)&"         ");
+        snake->printStringOnSpesificLocation(BaitStrCoord->X + 7, BaitStrCoord->Y, (char*)&"     ");
         // assing a random coodinate
         nodeStartCoord1 = *(snake->RandomPointCreate(list, false));
         baitCoord = *(snake->RandomPointCreate(list, true));
@@ -166,4 +172,5 @@ static void ScoreBoardUpdate(Coord_Typedef* ScoreStrCoord, Coord_Typedef* BaitSt
         *   successfully completed game detection               - ...
         *   sometimes bait doesnt come up even tough there is enough place - ... inspect
         *   portability issue will be considered                - ...
+        *   adjustable speed                                    - done
  */

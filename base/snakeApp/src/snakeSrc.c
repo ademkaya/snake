@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define vertSpeedInitVal    50000000
+#define horzSpeedInitVal    80000000
+
 static const char Hline = (char)205;
 static const char Vline = (char)186;
 static const char RTCornerline = (char)187;
@@ -18,8 +21,8 @@ static const char bait = (char)'x';
 
 Coord_Typedef randomCoord = {0,0};
 
-const uint32_t vertSpeed = 30000000;
-const uint32_t horzSpeed = 32000000;
+uint32_t vertSpeed = vertSpeedInitVal;
+uint32_t horzSpeed = horzSpeedInitVal;
 
 static uint16_t X1 = 0;
 static uint16_t X2 = 0;
@@ -42,9 +45,11 @@ static Coord_Typedef* RandomPointCreate(doublyLinkedList_Typedef* list, bool put
 static uint16_t getListCount(doublyLinkedList_Typedef* list);
 static void CalcEraseTheLast(doublyLinkedList_Typedef* list, bool action);
 static bool SelfHitCheck(doublyLinkedList_Typedef* list);
+static void AdjustSpeed(uint16_t baitCount, bool reset);
 
-static bool SelfHit;
-static bool WallHit;
+
+static bool SelfHit  = false;
+static bool WallHit = false;
 static bool IsSelfHit(void);
 static bool IsWallHit(void);
 
@@ -71,7 +76,7 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
         (*ptr)->CalcEraseTheLast = &CalcEraseTheLast;
         (*ptr)->printCharOnSpesificLocation = &printCharOnSpesificLocation;
         (*ptr)->printStringOnSpesificLocation = &printStringOnSpesificLocation;
-        
+        (*ptr)->AdjustSpeed = &AdjustSpeed;
         (*ptr)->IsWallHit = &IsWallHit;
         (*ptr)->IsSelfHit = &IsSelfHit;
 
@@ -83,6 +88,21 @@ bool InitializeSnakePtr(snake_typedef** ptr,uint32_t XLow,uint32_t XHigh, uint32
         Y2 = YHigh;
     }
     return retVal;
+}
+
+static void AdjustSpeed(uint16_t baitCount,bool reset) {
+
+    if ((!reset)&&(!(baitCount % 10))) {
+        if ((vertSpeed >= 3000000) || (horzSpeed >= 3000000)) {
+            vertSpeed -= 1000000;
+            horzSpeed -= 1000000;
+        }
+    } else {
+        vertSpeed = vertSpeedInitVal;
+        horzSpeed = horzSpeedInitVal;    
+    }
+
+   printf("   %d %d\n", vertSpeed, horzSpeed);
 }
 
 static bool SelfHitCheck(doublyLinkedList_Typedef* list) {

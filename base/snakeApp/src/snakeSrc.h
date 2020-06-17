@@ -17,6 +17,7 @@
 extern "C" {
 #endif
 
+
 	typedef struct Coord {
 		uint16_t X;
 		uint16_t Y;
@@ -37,6 +38,8 @@ extern "C" {
 
 		bool						(*IsSelfHit)						(void);
 		bool						(*IsWallHit)						(void);
+
+		void						(*AdjustSpeed)						(uint16_t baitCount, bool reset);
 
 		bool						(*IsBaitEaten)						(doublyLinkedList_Typedef* ptr, Coord_Typedef* baitPtr);
 		Coord_Typedef*				(*RandomPointCreate)				(doublyLinkedList_Typedef* list, bool putOnScreen);
