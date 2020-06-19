@@ -102,7 +102,7 @@ static void AdjustSpeed(uint16_t baitCount,bool reset) {
         horzSpeed = horzSpeedInitVal;    
     }
 
-   printf("   %d %d\n", vertSpeed, horzSpeed);
+  // printf("   %d %d\n", vertSpeed, horzSpeed);
 }
 
 static bool SelfHitCheck(doublyLinkedList_Typedef* list) {
